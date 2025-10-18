@@ -1,0 +1,21 @@
+{
+  "short_name": "SafeRoot",
+  "name": "Saferoot: AI Herbal Supply Chain",
+  "description": "An AI-driven blockchain platform for secure herbal product management.",
+  "icons": [
+    {
+      "src": "/icon-192x192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/icon-512x512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#166534",
+  "background_color": "#f0f9f3"
+}
