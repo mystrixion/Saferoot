@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Saferoot: AI Herbal Supply Chain</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    // Anti-flicker script to prevent flash of light theme
+    (function() {
+      const theme = localStorage.getItem('saferoot_theme');
+      if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    })();
+  </script>
+  <style>
+    html {
+      background-color: #f0f9f3; /* Light theme background */
+      color-scheme: light;
+    }
+    html.dark {
+      background-color: #111827; /* Dark theme background (Tailwind gray-900) */
+      color-scheme: dark;
+    }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+        'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+        sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      background-color: transparent; /* Body is transparent, html has the color */
+      overflow: hidden; /* Hide scrollbars from floating elements */
+    }
+
+    .floating-herbs {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      overflow: hidden;
+    }
+
+    .floating-herbs span {
+      position: absolute;
+      bottom: -100px; /* Start below the screen */
+      display: block;
+      background-size: contain;
+      background-repeat: no-repeat;
+      animation: drift linear infinite;
+      opacity: 0;
+    }
+
+    @keyframes drift {
+      0% {
+        transform: translateY(0) translateX(0) rotate(0deg);
+        opacity: 0;
+      }
+      10%, 90% {
+        opacity: 0.4;
+      }
+      100% {
+        transform: translateY(-120vh) translateX(var(--drift-x)) rotate(var(--drift-rotate));
+        opacity: 0;
+      }
+    }
+    
+    html:not(.dark) .floating-herbs span {
+      filter: invert(1);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    .animate-fade-in {
+      animation: fadeIn 0.5s ease-in-out;
+    }
+    .animate-fade-in-fast {
+      animation: fadeIn 0.2s ease-in-out;
+    }
+
+
+    /* Define different icons and randomize their animation */
+    /* Icon: Chamomile-like flower */
+    .floating-herbs span:nth-child(1) {
+      left: 10%; width: 40px; height: 40px;
+      animation-duration: 22s; animation-delay: 0s;
+      --drift-x: 5vw; --drift-rotate: -30deg;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 12c-2.333 0-4.667-1-7-3'/><path d='M12 12c2.333 0 4.667-1-7-3'/><path d='M12 12c-2.333 0-4.667 1-7 3'/><path d='M12 12c2.333 0 4.667 1 7 3'/><path d='M19 9a7 7 0 1 1-14 0'/><path d='M5 9a7 7 0 1 0 14 0'/><circle cx='12' cy='12' r='1'/><path d='M12 19v3'/><path d='M12 2v1'/></svg>");
+    }
+    /* Icon: Mint/Basil */
+    .floating-herbs span:nth-child(2) {
+      left: 20%; width: 50px; height: 50px;
+      animation-duration: 35s; animation-delay: 2s;
+      --drift-x: -10vw; --drift-rotate: 60deg;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 22V12c0-4-4-6-4-6s4 2 4 6c0-4 4-6 4-6s-4 2-4 6'/><path d='M12 12c-4 0-6 2-6 6h12c0-4-2-6-6-6z'/></svg>");
+    }
+    /* Icon: Leafy branch */
+    .floating-herbs span:nth-child(3) {
+      left: 30%; width: 30px; height: 30px;
+      animation-duration: 18s; animation-delay: 4s;
+      --drift-x: 8vw; --drift-rotate: 45deg;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 18c4.5-4.5 4.5-11.5 0-16'/><path d='M10 14c-4.5-4.5-4.5-11.5 0-16'/><path d='M14 10c4.5-4.5 4.5-11.5 0-16'/><path d='M18 6c-4.5-4.5-4.5-11.5 0-16'/></svg>");
+    }
+    /* Icon: Ginger root */
+    .floating-herbs span:nth-child(4) {
+      left: 45%; width: 60px; height: 60px;
+      animation-duration: 40s; animation-delay: 0s;
+      --drift-x: -5vw; --drift-rotate: -50deg;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 12s-4-2-8-2-4 4-4 8 4 8 8 8 8-4 8-8-2-4-2-4'/><path d='M12 12s4 2 8 2 4-4 4-8-4-8-8-8-8 4-8 8 2 4 2 4'/></svg>");
+    }
+    /* Icon: Olive branch */
+    .floating-herbs span:nth-child(5) {
+      left: 65%; width: 35px; height: 35px;
+      animation-duration: 25s; animation-delay: 7s;
+      --drift-x: 12vw; --drift-rotate: 80deg;
+       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 22s4-4 4-8-4-8-4-8'/><path d='M10 2s-4 4-4 8 4 8 4 8'/><circle cx='6' cy='6' r='2'/><circle cx='6' cy='18' r='2'/></svg>");
+    }
+    /* Icon: Cannabis/Hemp */
+    .floating-herbs span:nth-child(6) {
+      left: 80%; width: 45px; height: 45px;
+      animation-duration: 28s; animation-delay: 3s;
+      --drift-x: -8vw; --drift-rotate: -20deg;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 22V12'/><path d='M12 12L7 4'/><path d='M12 12L17 4'/><path d='M12 12l-5 5'/><path d='M12 12l5 5'/><path d='M2 17h10'/><path d='M12 17h10'/></svg>");
+    }
+    /* Icon: Ginkgo leaf */
+    .floating-herbs span:nth-child(7) {
+        left: 90%; width: 25px; height: 25px;
+        animation-duration: 20s; animation-delay: 1s;
+        --drift-x: 4vw; --drift-rotate: 40deg;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 22V12c0-4 4-8 8-8'/><path d='M12 22V12c0-4-4-8-8-8'/></svg>");
+    }
+    /* Icon: Pine branch */
+    .floating-herbs span:nth-child(8) {
+      left: 55%; width: 38px; height: 38px;
+      animation-duration: 32s; animation-delay: 11s;
+      --drift-x: -15vw; --drift-rotate: -90deg;
+       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 22V2'/><path d='M12 18l-4-4'/><path d='M12 18l4-4'/><path d='M12 12l-4-4'/><path d='M12 12l4-4'/><path d='M12 6l-4-4'/><path d='M12 6l4-4'/></svg>");
+    }
+    /* Icon: Willow branch */
+    .floating-herbs span:nth-child(9) {
+      left: 5%; width: 28px; height: 28px;
+      animation-duration: 45s; animation-delay: 5s;
+      --drift-x: 10vw; --drift-rotate: 120deg;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 22c-4-4-4-12-4-20'/><path d='M16 22c-4-4-4-12-4-20'/><path d='M8 22c-4-4-4-12-4-20'/></svg>");
+    }
+    /* Icon: Mint/Basil (copy) */
+    .floating-herbs span:nth-child(10) {
+      left: 25%; width: 42px; height: 42px;
+      animation-duration: 29s; animation-delay: 8s;
+      --drift-x: -7vw; --drift-rotate: -10deg;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 22V12c0-4-4-6-4-6s4 2 4 6c0-4 4-6 4-6s-4 2-4 6'/><path d='M12 12c-4 0-6 2-6 6h12c0-4-2-6-6-6z'/></svg>");
+    }
+    /* Icon: Another leafy branch */
+    .floating-herbs span:nth-child(11) {
+      left: 38%; width: 55px; height: 55px;
+      animation-duration: 21s; animation-delay: 13s;
+      --drift-x: 6vw; --drift-rotate: 35deg;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 22c4-4 8-4 12-8s4-8 8-12'/><path d='M2 14c4-4 8-4 12-8'/><path d='M2 6c4-4 8-4 12-8'/><path d='M10 22c4-4 8-4 12-8'/><path d='M18 22c4-4 8-4 12-8'/></svg>");
+    }
+     /* Icon: Ginkgo leaf (copy) */
+    .floating-herbs span:nth-child(12) {
+      left: 50%; width: 33px; height: 33px;
+      animation-duration: 38s; animation-delay: 9s;
+      --drift-x: -12vw; --drift-rotate: -70deg;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 22V12c0-4 4-8 8-8'/><path d='M12 22V12c0-4-4-8-8-8'/></svg>");
+    }
+    /* Icon: Chamomile-like flower (copy) */
+    .floating-herbs span:nth-child(13) {
+      left: 70%; width: 48px; height: 48px;
+      animation-duration: 19s; animation-delay: 6s;
+      --drift-x: 9vw; --drift-rotate: 15deg;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 12c-2.333 0-4.667-1-7-3'/><path d='M12 12c2.333 0 4.667-1-7-3'/><path d='M12 12c-2.333 0-4.667 1-7 3'/><path d='M12 12c2.333 0 4.667 1 7 3'/><path d='M19 9a7 7 0 1 1-14 0'/><path d='M5 9a7 7 0 1 0 14 0'/><circle cx='12' cy='12' r='1'/><path d='M12 19v3'/><path d='M12 2v1'/></svg>");
+    }
+     /* Icon: Cannabis/Hemp (copy) */
+    .floating-herbs span:nth-child(14) {
+      left: 85%; width: 36px; height: 36px;
+      animation-duration: 33s; animation-delay: 1s;
+      --drift-x: -4vw; --drift-rotate: -45deg;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 22V12'/><path d='M12 12L7 4'/><path d='M12 12L17 4'/><path d='M12 12l-5 5'/><path d='M12 12l5 5'/><path d='M2 17h10'/><path d='M12 17h10'/></svg>");
+    }
+    /* Icon: Ginger root (copy) */
+    .floating-herbs span:nth-child(15) {
+      left: 95%; width: 22px; height: 22px;
+      animation-duration: 26s; animation-delay: 10s;
+      --drift-x: 3vw; --drift-rotate: 55deg;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 12s-4-2-8-2-4 4-4 8 4 8 8 8 8-4 8-8-2-4-2-4'/><path d='M12 12s4 2 8 2 4-4 4-8-4-8-8-8-8 4-8 8 2 4 2 4'/></svg>");
+    }
+    /* Icon: Olive branch (copy) */
+     .floating-herbs span:nth-child(16) {
+      left: 75%; width: 60px; height: 60px;
+      animation-duration: 50s; animation-delay: 4s;
+      --drift-x: -20vw; --drift-rotate: 150deg;
+       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 22s4-4 4-8-4-8-4-8'/><path d='M10 2s-4 4-4 8 4 8 4 8'/><circle cx='6' cy='6' r='2'/><circle cx='6' cy='18' r='2'/></svg>");
+    }
+    /* OLD ICONS END, 16 TOTAL */
+    /* Icon: Berries */
+    .floating-herbs span:nth-child(17) {
+      left: 15%; width: 35px; height: 35px;
+      animation-duration: 34s; animation-delay: 12s;
+      --drift-x: 7vw; --drift-rotate: -15deg;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 2v20'/><path d='M8 6s-4 4-4 8'/><path d='M16 6s4 4 4 8'/><circle cx='8' cy='10' r='2'/><circle cx='16' cy='10' r='2'/></svg>");
+    }
+    /* Icon: Fern */
+    .floating-herbs span:nth-child(18) {
+      left: 35%; width: 45px; height: 45px;
+      animation-duration: 27s; animation-delay: 15s;
+      --drift-x: -9vw; --drift-rotate: 50deg;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 2v20'/><path d='M12 18H6'/><path d='M12 14H8'/><path d='M12 10H10'/><path d='M12 6H11'/><path d='M12 18h6'/><path d='M12 14h4'/><path d='M12 10h2'/><path d='M12 6h1'/></svg>");
+    }
+    /* Icon: Lavender */
+    .floating-herbs span:nth-child(19) {
+      left: 50%; width: 28px; height: 28px;
+      animation-duration: 42s; animation-delay: 18s;
+      --drift-x: 11vw; --drift-rotate: -65deg;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 22V8'/><path d='M10 8h4'/><path d='M9 12h6'/><path d='M8 16h8'/></svg>");
+    }
+    /* Icon: Clover */
+    .floating-herbs span:nth-child(20) {
+      left: 60%; width: 40px; height: 40px;
+      animation-duration: 23s; animation-delay: 20s;
+      --drift-x: -6vw; --drift-rotate: 25deg;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 22v-6'/><path d='M12 16a5 5 0 0 0-5-5c0-2.76 2.24-5 5-5s5 2.24 5 5a5 5 0 0 0-5 5z'/><path d='M12 16a5 5 0 0 1-5-5c0-2.76 2.24-5 5-5s5 2.24 5 5a5 5 0 0 1-5 5z'/></svg>");
+    }
+    /* Icon: Lotus */
+    .floating-herbs span:nth-child(21) {
+      left: 78%; width: 55px; height: 55px;
+      animation-duration: 36s; animation-delay: 10s;
+      --drift-x: 14vw; --drift-rotate: 95deg;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 17c0-4 4-8 10-8s10 4 10 8'/><path d='M6 17c0-3.31 2.69-6 6-6s6 2.69 6 6'/><path d='M12 11V9'/><path d='M12 17v2'/></svg>");
+    }
+    /* Icon: Wheat */
+    .floating-herbs span:nth-child(22) {
+      left: 88%; width: 32px; height: 32px;
+      animation-duration: 24s; animation-delay: 14s;
+      --drift-x: -11vw; --drift-rotate: -35deg;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 22V2'/><path d='M16 10l-4-4-4 4'/><path d='M16 14l-4-4-4 4'/><path d='M16 18l-4-4-4 4'/></svg>");
+    }
+    /* Icon: Root vegetable */
+    .floating-herbs span:nth-child(23) {
+      left: 28%; width: 38px; height: 38px;
+      animation-duration: 30s; animation-delay: 22s;
+      --drift-x: 8vw; --drift-rotate: 180deg;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 2v8'/><path d='M9 6l3-4 3 4'/><path d='M12 10a8 8 0 0 0-8 8v2h16v-2a8 8 0 0 0-8-8z'/></svg>");
+    }
+    /* Icon: Mushroom */
+    .floating-herbs span:nth-child(24) {
+      left: 2%; width: 48px; height: 48px;
+      animation-duration: 48s; animation-delay: 9s;
+      --drift-x: -10vw; --drift-rotate: -80deg;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 2a8 8 0 0 0-8 8v2h16V10a8 8 0 0 0-8-8z'/><path d='M12 10v12'/></svg>");
+    }
+    /* PREVIOUS ICONS END, 24 TOTAL */
+    /* Icon: Seed Pod */
+    .floating-herbs span:nth-child(25) {
+        left: 8%; width: 30px; height: 30px;
+        animation-duration: 25s; animation-delay: 15s;
+        --drift-x: -5vw; --drift-rotate: 75deg;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 22V2'/><path d='M12 14a4 4 0 1 0 0-8 4 4 0 0 0 0 8z'/><path d='M12 20a4 4 0 1 0 0-8 4 4 0 0 0 0 8z'/></svg>");
+    }
+    /* Icon: Simple Flower */
+    .floating-herbs span:nth-child(26) {
+        left: 18%; width: 45px; height: 45px;
+        animation-duration: 38s; animation-delay: 18s;
+        --drift-x: 10vw; --drift-rotate: -25deg;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='2'/><path d='M12 5.5V2'/><path d='M12 22v-3.5'/><path d='M18.5 12H22'/><path d='M2 12h3.5'/><path d='M16.24 7.76l2.12-2.12'/><path d='M5.64 18.36l2.12-2.12'/><path d='M18.36 18.36l-2.12-2.12'/><path d='M7.76 7.76l-2.12-2.12'/></svg>");
+    }
+    /* Icon: Spiraling Vine */
+    .floating-herbs span:nth-child(27) {
+        left: 28%; width: 35px; height: 35px;
+        animation-duration: 29s; animation-delay: 21s;
+        --drift-x: -8vw; --drift-rotate: 110deg;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 12c0 5.523 4.477 10 10 10S22 17.523 22 12 17.523 2 12 2 2 6.477 2 12zm5 0c0 2.76 2.24 5 5 5s5-2.24 5-5-2.24-5-5-5-5 2.24-5 5z'/></svg>");
+    }
+    /* Icon: Dandelion Seed */
+    .floating-herbs span:nth-child(28) {
+        left: 42%; width: 25px; height: 25px;
+        animation-duration: 20s; animation-delay: 24s;
+        --drift-x: 12vw; --drift-rotate: -40deg;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 22V12'/%3E%3Cpath d='M12 12a8 8 0 0 1 8-8'/%3E%3Cpath d='M12 12a8 8 0 0 0-8-8'/%3E%3Cpath d='M12 12v-8'/%3E%3Cpath d='M12 12h-8'/%3E%3Cpath d='M12 12h8'/%3E%3C/svg%3E");
+    }
+    /* Icon: Rosemary Sprig */
+    .floating-herbs span:nth-child(29) {
+        left: 58%; width: 40px; height: 40px;
+        animation-duration: 45s; animation-delay: 17s;
+        --drift-x: -11vw; --drift-rotate: 60deg;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 22l10-10'/><path d='M8 18l-4 4'/><path d='M12 14l-4 4'/><path d='M16 10l-4 4'/><path d='M20 6l-4 4'/></svg>");
+    }
+    /* Icon: Eucalyptus */
+    .floating-herbs span:nth-child(30) {
+        left: 72%; width: 50px; height: 50px;
+        animation-duration: 33s; animation-delay: 20s;
+        --drift-x: 9vw; --drift-rotate: -100deg;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 22c10-10 10-20 20-20'/><circle cx='8' cy='16' r='3'/><circle cx='16' cy='8' r='3'/></svg>");
+    }
+    /* Icon: Star Anise */
+    .floating-herbs span:nth-child(31) {
+        left: 82%; width: 38px; height: 38px;
+        animation-duration: 26s; animation-delay: 23s;
+        --drift-x: -7vw; --drift-rotate: 150deg;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 2l3 7h7l-5 5 2 7-7-4-7 4 2-7-5-5h7z'/></svg>");
+    }
+    /* Icon: Burdock */
+    .floating-herbs span:nth-child(32) {
+        left: 92%; width: 32px; height: 32px;
+        animation-duration: 40s; animation-delay: 16s;
+        --drift-x: 15vw; --drift-rotate: -130deg;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='8'/><path d='M12 2V4'/><path d='M12 20v2'/><path d='M2 12H4'/><path d='M20 12h2'/><path d='M4.93 4.93l1.41 1.41'/><path d='M17.66 17.66l1.41 1.41'/><path d='M4.93 19.07l1.41-1.41'/><path d='M17.66 6.34l1.41-1.41'/></svg>");
+    }
+    /* PREVIOUS ICONS END, 32 TOTAL */
+    /* Icon: Ginseng Root */
+    .floating-herbs span:nth-child(33) {
+      left: 7%; width: 40px; height: 40px;
+      animation-duration: 37s; animation-delay: 25s;
+      --drift-x: 6vw; --drift-rotate: -48deg;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 10V2'/%3E%3Cpath d='M10 4h4'/%3E%3Cpath d='M12 10l-2 4'/%3E%3Cpath d='M12 10l2 4'/%3E%3Cpath d='M10 14l-2 6'/%3E%3Cpath d='M14 14l2 6'/%3E%3Cpath d='M8 20l-2-2'/%3E%3Cpath d='M16 20l2-2'/%3E%3C/svg%3E");
+    }
+    /* Icon: Turmeric */
+    .floating-herbs span:nth-child(34) {
+      left: 17%; width: 35px; height: 35px;
+      animation-duration: 29s; animation-delay: 28s;
+      --drift-x: -8vw; --drift-rotate: 88deg;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 12a4 4 0 1 0-8 0 4 4 0 0 0 8 0z'/%3E%3Cpath d='M16 16a4 4 0 1 0-8 0 4 4 0 0 0 8 0z'/%3E%3Cpath d='M10 14a4 4 0 1 1 8 0 4 4 0 0 1-8 0z'/%3E%3C/svg%3E");
+    }
+    /* Icon: Aloe Vera */
+    .floating-herbs span:nth-child(35) {
+      left: 29%; width: 50px; height: 50px;
+      animation-duration: 44s; animation-delay: 26s;
+      --drift-x: 11vw; --drift-rotate: -15deg;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 22C12 22 8 12 2 12'/%3E%3Cpath d='M12 22C12 22 16 12 22 12'/%3E%3Cpath d='M12 22V12'/%3E%3Cpath d='M12 12c-2-5 0-10 0-10s2 5 0 10z'/%3E%3C/svg%3E");
+    }
+    /* Icon: Sage */
+    .floating-herbs span:nth-child(36) {
+      left: 44%; width: 38px; height: 38px;
+      animation-duration: 31s; animation-delay: 30s;
+      --drift-x: -10vw; --drift-rotate: 125deg;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 22l10-10'/%3E%3Cpath d='M12 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0z'/%3E%3Cpath d='M18 6a4 4 0 1 1-8 0 4 4 0 0 1 8 0z'/%3E%3C/svg%3E");
+    }
+    /* Icon: Thyme */
+    .floating-herbs span:nth-child(37) {
+      left: 56%; width: 28px; height: 28px;
+      animation-duration: 22s; animation-delay: 29s;
+      --drift-x: 13vw; --drift-rotate: -95deg;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 22l20-20'/%3E%3Cpath d='M6 20l-2 2'/%3E%3Cpath d='M10 16l-2 2'/%3E%3Cpath d='M14 12l-2 2'/%3E%3Cpath d='M18 8l-2 2'/%3E%3Cpath d='M22 4l-2 2'/%3E%3C/svg%3E");
+    }
+    /* Icon: Oregano */
+    .floating-herbs span:nth-child(38) {
+      left: 69%; width: 42px; height: 42px;
+      animation-duration: 39s; animation-delay: 24s;
+      --drift-x: -14vw; --drift-rotate: 33deg;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 22V2'/%3E%3Cpath d='M12 8H8a2 2 0 1 1 0-4h4'/%3E%3Cpath d='M12 16h4a2 2 0 1 0 0-4h-4'/%3E%3Cpath d='M12 12h-2a2 2 0 1 1 0-4h2'/%3E%3C/svg%3E");
+    }
+    /* Icon: Poppy Flower */
+    .floating-herbs span:nth-child(39) {
+      left: 81%; width: 52px; height: 52px;
+      animation-duration: 52s; animation-delay: 27s;
+      --drift-x: 8vw; --drift-rotate: -115deg;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 22v-8'/%3E%3Cpath d='M12 14a8 8 0 0 0-8-8c0-2 2-4 4-4s4 2 4 4c0-2 2-4 4-4s4 2 4 4a8 8 0 0 0-8 8z'/%3E%3C/svg%3E");
+    }
+    /* Icon: Valerian */
+    .floating-herbs span:nth-child(40) {
+      left: 94%; width: 34px; height: 34px;
+      animation-duration: 36s; animation-delay: 31s;
+      --drift-x: -9vw; --drift-rotate: 160deg;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 12V2'/%3E%3Cpath d='M10 4h4'/%3E%3Cpath d='M9 7h6'/%3E%3Cpath d='M8 10h8'/%3E%3Cpath d='M12 12l-2 4'/%3E%3Cpath d='M12 12l2 4'/%3E%3Cpath d='M10 16v6'/%3E%3Cpath d='M14 16v6'/%3E%3Cpath d='M8 18h8'/%3E%3C/svg%3E");
+    }
+    /* PREVIOUS ICONS END, 40 TOTAL */
+    /* NEW ICONS START HERE */
+    /* Icon: Echinacea */
+    .floating-herbs span:nth-child(41) {
+      left: 12%; width: 42px; height: 42px;
+      animation-duration: 33s; animation-delay: 33s;
+      --drift-x: -7vw; --drift-rotate: 78deg;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4z'/%3E%3Cpath d='M12 10l-2 4'/%3E%3Cpath d='M12 10l2 4'/%3E%3Cpath d='M12 10l-4 2'/%3E%3Cpath d='M12 10l4 2'/%3E%3Cpath d='M12 10l-4-2'/%3E%3Cpath d='M12 10l4-2'/%3E%3Cpath d='M12 10l-2-4'/%3E%3Cpath d='M12 10l2-4'/%3E%3Cpath d='M12 14v8'/%3E%3C/svg%3E");
+    }
+    /* Icon: Nettle Leaf */
+    .floating-herbs span:nth-child(42) {
+      left: 22%; width: 38px; height: 38px;
+      animation-duration: 25s; animation-delay: 35s;
+      --drift-x: 9vw; --drift-rotate: -108deg;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 12s2-8 10-8 10 8 10 8-2 8-10 8-10-8-10-8z'/%3E%3Cpath d='M12 4v16'/%3E%3Cpath d='M12 4L8 8'/%3E%3Cpath d='M12 12l-4 4'/%3E%3Cpath d='M12 20l-4-4'/%3E%3Cpath d='M12 4l4 4'/%3E%3Cpath d='M12 12l4 4'/%3E%3Cpath d='M12 20l4-4'/%3E%3C/svg%3E");
+    }
+    /* Icon: Flower Cluster */
+    .floating-herbs span:nth-child(43) {
+      left: 33%; width: 48px; height: 48px;
+      animation-duration: 48s; animation-delay: 31s;
+      --drift-x: -12vw; --drift-rotate: 135deg;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 22V12'/%3E%3Cpath d='M12 12c-3 0-5-2-5-5s2-5 5-5 5 2 5 5-2 5-5 5z'/%3E%3Cpath d='M7 17v-5'/%3E%3Cpath d='M7 12c-3 0-4-2-4-4s1-4 4-4 4 2 4 4-1 4-4 4z'/%3E%3Cpath d='M17 17v-5'/%3E%3Cpath d='M17 12c-3 0-4-2-4-4s1-4 4-4 4 2 4 4-1 4-4 4z'/%3E%3C/svg%3E");
+    }
+    /* Icon: Birch Leaves */
+    .floating-herbs span:nth-child(44) {
+      left: 48%; width: 30px; height: 30px;
+      animation-duration: 28s; animation-delay: 38s;
+      --drift-x: 10vw; --drift-rotate: 45deg;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 22l10-10'/%3E%3Cpath d='M8 12a4 4 0 1 0 8 0 4 4 0 0 0-8 0z'/%3E%3Cpath d='M14 6a4 4 0 1 0 8 0 4 4 0 0 0-8 0z'/%3E%3C/svg%3E");
+    }
+    /* Icon: Rose Flower */
+    .floating-herbs span:nth-child(45) {
+      left: 62%; width: 36px; height: 36px;
+      animation-duration: 35s; animation-delay: 32s;
+      --drift-x: -9vw; --drift-rotate: -60deg;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 22v-6'/%3E%3Cpath d='M12 16a8 8 0 0 0-8-8c0-4.42 3.58-8 8-8s8 3.58 8 8a8 8 0 0 0-8 8z'/%3E%3Cpath d='M12 12a4 4 0 0 0-4-4c0-2.21 1.79-4 4-4s4 1.79 4 4a4 4 0 0 0-4 4z'/%3E%3C/svg%3E");
+    }
+    /* Icon: Coriander/Parsley */
+    .floating-herbs span:nth-child(46) {
+      left: 74%; width: 28px; height: 28px;
+      animation-duration: 20s; animation-delay: 36s;
+      --drift-x: 15vw; --drift-rotate: 180deg;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 22V2'/%3E%3Cpath d='M12 8a3 3 0 1 0-6 0 3 3 0 0 0 6 0z'/%3E%3Cpath d='M12 14a3 3 0 1 0 6 0 3 3 0 0 0-6 0z'/%3E%3Cpath d='M6 8a3 3 0 1 0-6 0 3 3 0 0 0 6 0z'/%3E%3C/svg%3E");
+    }
+    /* Icon: Hops */
+    .floating-herbs span:nth-child(47) {
+      left: 86%; width: 44px; height: 44px;
+      animation-duration: 41s; animation-delay: 39s;
+      --drift-x: -11vw; --drift-rotate: 20deg;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 2v2'/%3E%3Cpath d='M12 22c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z'/%3E%3Cpath d='M12 14c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z'/%3E%3Cpath d='M12 18c-2.21 0-4-1.79-4-4h8c0 2.21-1.79 4-4 4z'/%3E%3C/svg%3E");
+    }
+    /* Icon: Calendula Flower */
+    .floating-herbs span:nth-child(48) {
+      left: 96%; width: 50px; height: 50px;
+      animation-duration: 55s; animation-delay: 34s;
+      --drift-x: 5vw; --drift-rotate: -90deg;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3Cpath d='M12 2v2'/%3E%3Cpath d='M12 20v2'/%3E%3Cpath d='M4.93 4.93l1.41 1.41'/%3E%3Cpath d='M17.66 17.66l1.41 1.41'/%3E%3Cpath d='M2 12h2'/%3E%3Cpath d='M20 12h2'/%3E%3Cpath d='M4.93 19.07l1.41-1.41'/%3E%3Cpath d='M17.66 6.34l1.41-1.41'/%3E%3C/svg%3E");
+    }
+  </style>
+<script type="importmap">
+{
+  "imports": {
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "react-router-dom": "https://aistudiocdn.com/react-router-dom@^7.9.4",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.24.0",
+    "qrcode.react": "https://aistudiocdn.com/qrcode.react@^3.1.0"
+  }
+}
+</script>
+</head>
+<body>
+  <div class="floating-herbs">
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+  <noscript>You need to enable JavaScript to run this app.</noscript>
+  <div id="root"></div>
+  <script type="module" src="/index.tsx"></script>
+</body>
+</html>

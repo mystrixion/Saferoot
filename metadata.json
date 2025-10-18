@@ -1,0 +1,8 @@
+{
+  "name": "Saferoot: AI Herbal Supply Chain",
+  "description": "An AI-driven blockchain platform for secure herbal product management with role-based login, lab-test verification, bio-waste routing, factory–farmer coordination, and automated communication.",
+  "requestFramePermissions": [
+    "camera",
+    "geolocation"
+  ]
+}
