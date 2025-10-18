@@ -1,5 +1,6 @@
 import { GoogleGenAI, Type } from '@google/genai';
-import type { VerificationResult, ChatMessage, UserRole } from '../types';
+// FIX: `UserRole` is used as a value (e.g., `UserRole.Farmer`), so it must not be a type-only import.
+import { UserRole, type VerificationResult, type ChatMessage } from '../types';
 
 // Helper function to convert a File object to a base64 encoded string.
 const fileToBase64 = (file: File): Promise<string> => {
@@ -427,6 +428,15 @@ export const getChatbotResponse = async (
   }
 };
 
+const FALLBACK_EXPLANATIONS: { [key in UserRole]?: string } = {
+    [UserRole.Farmer]: "As a Farmer, you will submit harvests for verification, manage bio-waste, and view permitted harvest zones.",
+    [UserRole.Lab]: "As a Lab Technician, you will upload test results for harvested batches to ensure quality and safety.",
+    [UserRole.Factory]: "As a Factory Worker, you will scan raw materials upon receipt and manage inventory for processing.",
+    [UserRole.Customer]: "As a Customer, you can scan product QR codes to view the full journey from farm to shelf.",
+    [UserRole.Admin]: "As an Admin, you will approve new user registrations and monitor the entire supply chain's integrity."
+};
+
+
 /**
  * Generates a brief explanation for a user role.
  * @param role The user role to explain.
@@ -452,6 +462,7 @@ export const getRoleExplanation = async (role: UserRole): Promise<string> => {
     return text;
   } catch (error) {
     console.error(`AI Service: Error generating explanation for role ${role}`, error);
-    return "Could not load role description at this time.";
+    // FIX: Use a hardcoded fallback for better resilience and user experience.
+    return FALLBACK_EXPLANATIONS[role] || "Could not load role description at this time.";
   }
 };

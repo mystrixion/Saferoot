@@ -74,6 +74,11 @@ const HerbDatabaseScreen: React.FC = () => {
                     src={herb.imageUrl}
                     alt={herb.name}
                     className="h-16 w-16 object-cover rounded-lg flex-shrink-0 bg-gray-200 dark:bg-gray-700"
+                    onError={(e) => {
+                      e.currentTarget.onerror = null; // prevents looping
+                      // Fallback to a gray LeafIcon SVG
+                      e.currentTarget.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23a0aec0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M17 8c-4.5-1-5-8-11-8' /%3E%3Cpath d='M17 8c0 5-4.5 9-11 9' /%3E%3C/svg%3E";
+                    }}
                   />
                   <div className="flex-1">
                     <h3 className="font-bold text-lg text-gray-900 dark:text-gray-100">{herb.name}</h3>
